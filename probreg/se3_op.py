@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import division
 import numpy as np
 import transformations as trans
+from .dq3d import dualquat, quat
 
 
 def skew(x):
@@ -35,6 +36,13 @@ def twist_mul(tw, rot, t):
     return np.dot(tr, rot), np.dot(t, tr.T) + tt
 
 
+def tw_dq(tw):
+    ang = np.linalg.norm(tw[:3])
+    if ang < np.finfo(np.float32).eps:
+        return dualquat(quat.identity(), tw[3:])
+    return dualquat(quat(ang, tw[:3] / ang), tw[3:])
+
+
 def diff_x_from_tw(x):
     return np.array([[0.0, x[2], -x[1], 1.0, 0.0, 0.0],
                      [-x[2], 0.0, x[0], 0.0, 1.0, 0.0],
@@ -42,6 +50,13 @@ def diff_x_from_tw(x):
 
 
 def diff_rot_from_quaternion(q):
+    """Differencial rotation matrix from quaternion.
+
+    dR(q)/dq = [dR(q)/dq0, dR(q)/dq1, dR(q)/dq2, dR(q)/dq3]
+
+    Args:
+        q (numpy.ndarray): Quaternion.
+    """
     rot = trans.quaternion_matrix(q)[:3, :3]
     q2 = np.square(q)
     z = np.sum(q2)

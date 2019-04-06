@@ -2,5 +2,6 @@ include README.md
 include LICENSE
 
 graft probreg/cc
+graft probreg/dq3d
 graft third_party/eigen/Eigen
 graft third_party/permutohedral

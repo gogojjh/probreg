@@ -154,6 +154,18 @@ ext_modules = [
         ],
         language='c++'
     ),
+    Extension(
+        'probreg.dq3d._eigen_dq',
+        ['probreg/dq3d/dual_quaternion_py.cc'],
+        include_dirs=[
+            # Path to pybind11 headers
+            get_pybind_include(),
+            get_pybind_include(user=True),
+            find_eigen(['third_party/eigen']),
+            'probreg/dq3d'
+        ],
+        language='c++'
+    ),
 ]
 
 

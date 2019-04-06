@@ -23,7 +23,7 @@ This package implements several algorithms using stochastic models and provides 
 * Distance minimization of two probabilistic distributions
     * [GMMReg(2011)](https://ieeexplore.ieee.org/document/5674050)
     * [Support Vector Registration(2015)](https://arxiv.org/pdf/1511.04240.pdf)
-* Stocastic model with spatial partitioning
+* Hierarchical Stocastic model
     * [GMMTree(2018)](https://arxiv.org/pdf/1807.02587.pdf)
 
 ## Installation
@@ -97,3 +97,11 @@ o3.draw_geometries([source, target, result])
 | CPD | SVR |
 |-----|-----|
 | <img src="https://raw.githubusercontent.com/neka-nat/probreg/master/images/cpd_nonrigid.gif" width="640"> | <img src="https://raw.githubusercontent.com/neka-nat/probreg/master/images/svr_nonrigid.gif" width="640"> |
+
+
+## Transformations
+
+| type | CPD | SVR, GMMReg | GMMTree | FilterReg |
+|------|-----|-------------|---------|-----------|
+|Rigid | Scale + 6D pose | 6D pose | 6D pose | 6D pose|
+|NonRigid | Affine, MCT | TPS | - | Deformable skin |

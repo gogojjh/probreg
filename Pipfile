@@ -15,6 +15,7 @@ matplotlib = "*"
 
 [dev-packages]
 sphinx = "*"
+twine = "*"
 "flake8" = "*"
 sphinx-rtd-theme = "*"
 

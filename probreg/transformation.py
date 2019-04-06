@@ -1,9 +1,12 @@
 import abc
+from collections import namedtuple
+import itertools
 import six
 import numpy as np
 import open3d as o3
 from . import math_utils as mu
 
+from .dq3d import op
 
 @six.add_metaclass(abc.ABCMeta)
 class Transformation():
@@ -89,3 +92,37 @@ class TPSTransformation(Transformation):
     def _transform(self, points):
         basis, _ = self.prepare(points)
         return self.transform_basis(basis)
+
+
+class DeformableKinematicModel(Transformation):
+    class SkinningWeight(np.ndarray):
+        def __init__(self, n_points):
+            super(DeformableKinematicModel.SkinningWeight, self).__init__(n_points,
+                                                                          dtype=[('pair', 'i4', 2),
+                                                                                 ('val', 'f4', 2)])
+
+        @property
+        def n_nodes(self):
+            return self['pair'].max()
+
+        def pairs_set(self):
+            return itertools.permutations(range(self.n_nodes), 2)
+
+        def in_pair(self, pair):
+            return np.argwhere((self['pair']==pair).all(1)).flatten()
+
+    @classmethod
+    def make_weight(cls, pairs, vals):
+        weights = cls.SkinningWeight(pairs.shape[0])
+        weights['pair'] = pairs
+        weights['val'] = vals
+        return weights
+
+    def __init__(self, dual_quats, weights):
+        super(DeformableKinematicModel, self).__init__()
+        self.weights = weights
+        self.dual_quats = dual_quats
+        self.trans = [op.dlb(w[1], self.dual_quats[w[0]]) for w in self.weights]
+
+    def _transform(self, points):
+        return np.array([t.transform_points(p) for t, p in zip(self.trans, points)])
